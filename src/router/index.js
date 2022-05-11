@@ -340,7 +340,7 @@ const routes = [
     component: DefaultLayout,
     beforeEnter: (to, from, next) => {
       if (!store.state.AuthModule.auth) {
-        return next('/auth')
+        return next('/authLogin')
       }
       return next()
     },
