@@ -204,6 +204,7 @@ export default {
             // this.Loading()
           })
           .catch((e) => {
+            this.Loading()
             console.log(e)
           })
       }

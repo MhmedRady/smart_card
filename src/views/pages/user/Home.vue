@@ -3,6 +3,7 @@
     <WidgetsStatsA />
     <WidgetsStatsD />
     <hr />
+
     <CCard>
       <CCardBody>
         <h2 class="text-center my-3">All Users</h2>
@@ -13,30 +14,48 @@
               <CTableHeaderCell scope="col">Class</CTableHeaderCell>
               <CTableHeaderCell scope="col">Heading</CTableHeaderCell>
               <CTableHeaderCell scope="col">Heading</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
-          <CTableBody>
-            <CTableRow>
-              <CTableHeaderCell scope="row">1</CTableHeaderCell>
-              <CTableDataCell>Mark</CTableDataCell>
-              <CTableDataCell>Otto</CTableDataCell>
-              <CTableDataCell>@mdo</CTableDataCell>
+          <CTableBody v-if="users.length">
+            <CTableRow v-for="(user, index) in users" :key="user.id">
+              <CTableHeaderCell scope="row">{{ index + 1 }}</CTableHeaderCell>
+              <CTableDataCell>{{ user.name }}</CTableDataCell>
+              <CTableDataCell>{{ user.phone }}</CTableDataCell>
+              <CTableDataCell>{{ user.email }}</CTableDataCell>
+              <CTableDataCell>
+                <CButton
+                  color="primary"
+                  @click="
+                    () => {
+                      USER_MODAL(true), editUser(user)
+                    }
+                  "
+                  ><CIcon icon="cilPencil" size="md" /> Edit</CButton
+                >
+                <CButton
+                  color="danger"
+                  style="margin-left: 0.5rem; color: #fff"
+                  @click="DELETE_USER(user.id)"
+                  ><CIcon icon="cilBan" size="md" /> Delete</CButton
+                >
+              </CTableDataCell>
             </CTableRow>
+          </CTableBody>
+          <CTableBody v-else>
             <CTableRow>
-              <CTableHeaderCell scope="row">2</CTableHeaderCell>
-              <CTableDataCell>Jacob</CTableDataCell>
-              <CTableDataCell>Thornton</CTableDataCell>
-              <CTableDataCell>@fat</CTableDataCell>
-            </CTableRow>
-            <CTableRow>
-              <CTableHeaderCell scope="row">3</CTableHeaderCell>
-              <CTableDataCell colspan="2">Larry the Bird</CTableDataCell>
-              <CTableDataCell>@twitter</CTableDataCell>
+              <CTableDataCell colspan="5">
+                <CButton disabled class="m-auto justify-content-centet d-block">
+                  <CSpinner component="span" size="sm" aria-hidden="true" />
+                  Loading...
+                </CButton></CTableDataCell
+              >
             </CTableRow>
           </CTableBody>
         </CTable>
       </CCardBody>
     </CCard>
+    <UserModal :user="updateUser" />
   </div>
 </template>
 
@@ -51,12 +70,22 @@ import avatar6 from '@/assets/images/avatars/6.jpg'
 import WidgetsStatsA from '@/views/widgets/WidgetsStatsTypeA.vue'
 import WidgetsStatsD from '@/views/widgets/WidgetsStatsTypeD.vue'
 
+import UserModal from '@/components/user/userModal.vue'
+
+import { mapActions } from 'vuex'
+
 export default {
   name: 'Dashboard',
   components: {
     // MainChartExample,
+    UserModal,
     WidgetsStatsA,
     WidgetsStatsD,
+  },
+  data() {
+    return {
+      updateUser: {},
+    }
   },
   setup() {
     const progressGroupExample1 = [
@@ -173,7 +202,6 @@ export default {
         activity: 'Last week',
       },
     ]
-
     return {
       tableExample,
       progressGroupExample1,
@@ -181,5 +209,29 @@ export default {
       progressGroupExample3,
     }
   },
+  async mounted() {
+    this.pageTitle('User Dashboard ')
+    await this.ALL_USER()
+  },
+  computed: {
+    users() {
+      return this.$store.state.AuthModule.users
+    },
+  },
+  methods: {
+    ...mapActions(['ALL_USER', 'Loading', 'USER_MODAL', 'DELETE_USER']),
+    editUser(user) {
+      let password = document.getElementById('password')
+      console.log(password)
+      this.updateUser = user
+    },
+  },
 }
 </script>
+
+<style lang="scss" scoped>
+.spinner-border {
+  border: 0.15em solid #0d80b9;
+  border-right-color: transparent;
+}
+</style>
